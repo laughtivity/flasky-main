@@ -2,51 +2,8 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.crystal import Crystal
 
-# class Crystal:
-#     def __init__(self, id, name, color, powers):
-#         self.id = id
-#         self.name = name
-#         self.color = color
-#         self.powers = powers
-
-#create a list of crystals
-# crystals = [
-#     Crystal(1, "Amethyst", "Purple", "Infinite knowledge and wisdom"),
-#     Crystal(5, "Tiger's Eye", "Gold", "Confidence"),
-#     Crystal(2, "Sapphire", "Dark Blue", "Peace"),
-#     Crystal(3, "Rose Quartz", "Pink", "Self Love"),
-# ]
-
-
 # Blueprint to glue all our crystal routes together
 crystal_bp = Blueprint("books", __name__, url_prefix="/crystals")
-
-# # define the function to handle the crystals
-# @crystals_bp.route("", methods=["GET"])
-# def handle_crystals():
-#     crystals_response = []
-#     for crystal in crystals:
-#         crystals_response.append({
-#             "id": crystal.id,
-#             "name": crystal.name,
-#             "color": crystal.color,
-#             "powers": crystal.powers
-#         })
-#     return jsonify(crystals_response)
-
-# # route will look like localhost:5000/crystals/1
-# # create a decorator to group the same route to crystals
-# @crystals_bp.route("/<crystal_id>", methods=["GET"])
-# determine respresentation and return response.
-# def handle_crystal(crystal_id):
-#     crystal = validate_crystal_id(crystal_id)
-
-#     return {
-#         "id" : crystal.id,
-#         "name": crystal.name,
-#         "color": crystal.color,
-#         "powers": crystal.powers
-#             }
 
 # HELPER FUNCTION - VALIDATES CRYSTAL ID EXISTS
 # responsible for validating and returning crystal instance
@@ -71,14 +28,10 @@ def validate_crystal_id(crystal_id):
 # CREATE NEW CRYSTAL - POST METHOD
 @crystal_bp.route("", methods=['POST'])
 # define a route for creating a crystal resource
-def handle_crystal():
+def create_crystal():
     request_body = request.get_json()  
 
-    new_crystal = Crystal(
-        name = request_body["name"],
-        color = request_body["color"],
-        powers = request_body["powers"]
-    )
+    new_crystal = Crystal(request_body)
 
     db.session.add(new_crystal)
     db.session.commit()
@@ -107,12 +60,7 @@ def read_all_crystals():
         crystals = Crystal.query.all()
 
     for crystal in crystals:
-        crystals_response.append({
-            "id": crystal.id,
-            "name": crystal.name,
-            "color": crystal.color,
-            "powers": crystal.powers
-        })
+        crystals_response.append(crystal.to_dict())
     return jsonify(crystals_response)
 
 # define a route for getting a single crystal
@@ -124,12 +72,7 @@ def read_one_crystal(crystal_id):
     crystal = validate_crystal_id(crystal_id)
 
     # show a single crystal
-    return {
-        "id" : crystal.id,
-        "name": crystal.name,
-        "color": crystal.color,
-        "powers": crystal.powers
-    }, 200
+    return crystal.to_dict(), 200
 
 # define a route for updating a crystal
 # PUT /crystals/<crystal_id>
@@ -146,12 +89,7 @@ def update_crystal(crystal_id):
 
     db.session.commit()
 
-    return {
-        "id" : crystal.id,
-        "name": crystal.name,
-        "color": crystal.color,
-        "powers": crystal.powers
-    }, 200
+    return crystal.to_dict(), 200
 
 # define a route for deleting a crystal
 # DELETE /crystals/<crystal_id>
