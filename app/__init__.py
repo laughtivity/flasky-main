@@ -8,11 +8,6 @@ from dotenv import load_dotenv
 # used to read environment variables
 import os
 
-# import SQLAlchemy
-from flask_sqlalchemy import SQLAlchemy
-# import Migrate
-from flask_migrate import Migrate
-
 #gives us access to database operations
 db = SQLAlchemy()
 migrate = Migrate()
@@ -40,11 +35,13 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
 
     # import routes 
-    from .routes import crystal_bp
+    from .routes import crystal_bp, healer_bp
 
     #register the blueprint
     app.register_blueprint(crystal_bp)
+    app.register_blueprint(healer_bp)
     
     from app.models.crystal import Crystal
-
+    from app.models.healer import Healer
+    
     return app

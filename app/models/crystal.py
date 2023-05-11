@@ -5,6 +5,8 @@ class Crystal(db.Model):
     name = db.Column(db.String)
     color = db.Column(db.String)
     powers = db.Column(db.String)
+    healer_id = db.Column(db.Integer, db.ForeignKey('healer.id'))
+    healer = db.relationship("Healer", back_populates = "crystals")
 
     # we want to let the program know we want to use this before we create the instance
     # cls - is a reference to the class itself (not the object)
